@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -13,28 +12,40 @@
 			left: 0;
 			top: 0;
 		}
+
 	</style>
 </head>
-<body onmousedown="return false;">
-<svg width="320" height="480"></svg>
+
+<body id="body" onmousedown="return false;">
+<svg style="width:100%;height:100%;"></svg>
 <div id="container" class="container"></div>
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://cdn.mlkcca.com/v0.2.8/milkcocoa.js"></script>
+    <script type="text/javascript" src="./hand.minified-1.2.1.js"></script>
     <script src="./minlette/vector.js"></script>
     <script src="./angle.js"></script>
 
-<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
+	<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
+	<script type="text/javascript" src="labelstopper.js"></script>
     <script src="roulette.js"></script>
     <script src="snap.svg-min.js"></script>
+    <script src="snap.svg.pie.js"></script>
 <script defer="defer">
+
+
+
+
+
+
 $(function(){
-	var width = window.screen.width;
-	var height = window.screen.height;
+	var width  = $(window).width();
+	var height = $(window).height();
+
 	$("svg").attr("width", width);
 	$("svg").attr("height", height);
 	$("#container").attr("style", "width:" + width + "px; width:" + height + "px");
 	var s = Snap("svg");
-	var roulette = new Roulette(s, width / 2 - 30, width / 2);
+	var roulette = new Roulette(s, Math.min(width,height) / 2 * 0.8, width/2,height/2);
 	s.rect(width / 2 - 10, 0, 20, 100);
 	s.attr({
 		fill: "#777"
@@ -55,33 +66,33 @@ $(function(){
 		}
 		animationLoop();
 
-	function writeMessage(message) {
-		text.setText(message);
-		layer.draw();
-	}
+	// function writeMessage(message) {
+	// 	text.setText(message);
+	// 	layer.draw();
+	// }
 
-	var stage = new Kinetic.Stage({
-		container: 'container',
-		width: width,
-		height: height
-	});
-	var layer = new Kinetic.Layer();
+	// var stage = new Kinetic.Stage({
+	// 	container: 'container',
+	// 	width: width,
+	// 	height: height
+	// });
+	// var layer = new Kinetic.Layer();
 
-	var text = new Kinetic.Text({
-		x: 10,
-		y: 10,
-		fontFamily: 'Calibri',
-		fontSize: 24,
-		text: '',
-		fill: 'black'
-	});
+	// var text = new Kinetic.Text({
+	// 	x: 10,
+	// 	y: 10,
+	// 	fontFamily: 'Calibri',
+	// 	fontSize: 24,
+	// 	text: '',
+	// 	fill: 'black'
+	// });
 
-	var circle = new Kinetic.Circle({
-		x: width / 2,
-		y: height / 2,
-		radius: width / 2 - 10,
-		strokeWidth: 4
-	});
+	// var circle = new Kinetic.Circle({
+	// 	x: width / 2,
+	// 	y: height / 2,
+	// 	radius: width / 2 - 10,
+	// 	strokeWidth: 4
+	// });
 
 	var calcSpeed = function(centerX, centerY, startX, startY, endX, endY, timeStampX, timeStampY) {
 		// TODO
@@ -92,16 +103,17 @@ $(function(){
 		var theta2 = Angle.createAbsAngle(vec2.getTheta());
 		var dtheta = theta2.calcDiff(theta1);
 
+		if(timeDiff == 0){
+			return 0;	
+		}
+
 		var v = (dtheta.get())*100 / timeDiff;
 
-		console.log("theta1 = " + theta1);
-		console.log("theta2 = " + theta2);
-		console.log("dtheta1 = " + dtheta);
 
 		return v;
 	};
 
-	circle.rouletteStart = function(speed) {
+	var rouletteStart = function(speed) {
 		console.log("roulette start with speed: " + speed);
 		roulette.addForce(speed);
 		// TODO
@@ -114,32 +126,64 @@ $(function(){
 	 * mobile equivalents so they are often times
 	 * used together
 	 */
-	circle.on('mousedown touchstart', function(touchObj) {
-		touchStartX = touchObj.evt.changedTouches[0].clientX;
-		touchStartY = touchObj.evt.changedTouches[0].clientY;
-		touchStartTime = touchObj.evt.timeStamp;
-		writeMessage('Mousedown or touchstart');
-	}, this);
-	/*
-	 * mouseup and touchend are desktop and
-	 * mobile equivalents so they are often times
-	 * used together
-	 */
-	circle.on('mouseup touchend', function(touchObj) {
-		touchEndX = touchObj.evt.changedTouches[0].clientX;
-		touchEndY = touchObj.evt.changedTouches[0].clientY;
-		touchEndTime = touchObj.evt.timeStamp;
-		writeMessage('Mouseup or touchend');
-		circle.rouletteStart(calcSpeed(circle.getX(), circle.getY(),
+	// circle.on('mousedown touchstart', function(touchObj) {
+	// 	touchStartX = touchObj.evt.changedTouches[0].clientX;
+	// 	touchStartY = touchObj.evt.changedTouches[0].clientY;
+	// 	touchStartTime = touchObj.evt.timeStamp;
+	// 	writeMessage('Mousedown or touchstart');
+	// }, this);
+	// /*
+	//  * mouseup and touchend are desktop and
+	//  * mobile equivalents so they are often times
+	//  * used together
+	//  */
+	// circle.on('mouseup touchend', function(touchObj) {
+	// 	touchEndX = touchObj.evt.changedTouches[0].clientX;
+	// 	touchEndY = touchObj.evt.changedTouches[0].clientY;
+	// 	touchEndTime = touchObj.evt.timeStamp;
+	// 	writeMessage('Mouseup or touchend');
+	// 	circle.rouletteStart(calcSpeed(circle.getX(), circle.getY(),
+	// 			touchStartX, touchStartY,
+	// 			touchEndX, touchEndY,
+	// 			touchStartTime, touchEndTime));
+	// }, this);
+
+	var body = document.getElementById("body");
+
+	body.addEventListener("pointerdown", function(event){
+		touchStartX = event.clientX;
+		touchStartY = event.clientY;
+		touchStartTime =  parseInt((new Date).getTime());
+		// writeMessage('Mousedown or touchstart')	;
+		event.stopPropagation();
+		event.preventDefault();
+	},false);
+
+	
+
+	body.addEventListener("pointerup", function(event){
+		touchEndX = event.clientX;
+		touchEndY = event.clientY;
+		touchEndTime =  parseInt((new Date).getTime());
+		rouletteStart(
+			calcSpeed(
+				roulette.x, roulette.y, //しっかり中心を決める必要がある
 				touchStartX, touchStartY,
 				touchEndX, touchEndY,
-				touchStartTime, touchEndTime));
-	}, this);
+				touchStartTime, touchEndTime
+				)
+			);
+		event.stopPropagation();
+		event.preventDefault();
 
-	layer.add(circle);
-	layer.add(text);
-	stage.add(layer);
+	},false);
 
+
+
+
+	// layer.add(circle);
+	// layer.add(text);
+	// stage.add(layer);
 
 })
 
